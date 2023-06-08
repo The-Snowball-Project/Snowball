@@ -1,0 +1,6 @@
+# use a whitelist because its easier
+
+*
+!package.json
+!tsconfig.json
+!src

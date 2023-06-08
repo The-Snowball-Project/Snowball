@@ -1,0 +1,52 @@
+version: '3.4'
+
+services:
+  db:
+    image: postgres:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 3s
+        max_attempts: 3
+        window: 120s
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -q -U ${DB_USER} -d ${DB_PATH}"]
+      interval: 1s
+      timeout: 10s
+
+  snowball:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    deploy:
+      restart_policy:
+        condition: on_failure
+        delay: 3s
+        max_attempts: 3
+        window: 120s
+    # this annoying thing isnt working
+    #volumes:
+    #  - ./src/:/app/src/
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db:sevice_healthy
+    
+    environment:
+      ENV: dev
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 5432
+      DB_PATH: ${DB_PATH}
+    ports:
+      - 80:80
+      - 443:443

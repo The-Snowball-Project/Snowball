@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "target": "es2022",
+        "rootDir": "src/ts",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true
+    }
+}
