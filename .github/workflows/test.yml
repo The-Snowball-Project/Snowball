@@ -1,5 +1,12 @@
 Name: test
 
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+
 steps:
   # need checkout before using compose-action
   - uses: actions/checkout@v3
