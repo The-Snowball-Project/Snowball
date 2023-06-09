@@ -1,14 +1,17 @@
-FROM node:lts-alpine
-
-ENV ENV=dev
+FROM node:lts-alpine as base
 
 WORKDIR /app
 
-COPY ./src ./src
+COPY package.json ./
 
-COPY package.json .
-COPY tsconfig.json .
+COPY tsconfig.json ./
 
-RUN npm install
+RUN npm i
 
-CMD ["npm", "run","dev"]
+COPY . .
+
+FROM base as production
+
+ENV NODE_PATH=./build
+
+RUN npm run build
