@@ -1,9 +1,12 @@
 import * as express from 'express';
-import logger from "./util/logger";
+import server from './server';
+import { promises } from 'winston-daily-rotate-file';
+const process_port:string = process.env.PORT||"0";
+const port: number = parseInt(process_port) || 3000;
 
-const app = express();
-const port: string = process.env.PORT || "3000";
-app.use(express.static(__dirname + '/public'));
-app.listen(port, () => {
-  logger.info(`testing listening on port ${port}`)
-})
+
+const starter = new server().start(port)
+  .then(port => console.log(`Running on port ${port}`))
+  .catch(error => {
+    console.log(error)
+  });
