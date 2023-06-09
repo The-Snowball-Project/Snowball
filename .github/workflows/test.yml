@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   compose:
+    name: Run docker compose
     steps:
       # need checkout before using compose-action
       - uses: actions/checkout@v3
