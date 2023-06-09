@@ -1,10 +1,12 @@
 {
     "compilerOptions": {
-        "module": "ES2022",
+        "module": "commonjs",
         "moduleResolution": "node",
         "target": "es2022",
-        "rootDir": "src/ts",
+        "rootDir": "./src",
+        "outDir": "./build",
         "forceConsistentCasingInFileNames": true,
-        "strict": true
+        "strict": true,
+        "allowSyntheticDefaultImports":true
     }
 }

@@ -25,15 +25,13 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    deploy:
-      restart_policy:
-        condition: on_failure
-        delay: 3s
-        max_attempts: 3
-        window: 120s
-    # this annoying thing isnt working
-    #volumes:
-    #  - ./src/:/app/src/
+      target: base
+    volumes:
+      - ./src:/app/src
+      - ./nodemon.json:/app/nodemon.json
+    #needed?
+    expose:
+      - 3000
     depends_on:
       db:
         condition: service_healthy
@@ -50,3 +48,5 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 3000:3000
+    command: npm run dev
