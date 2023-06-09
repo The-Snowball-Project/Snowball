@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "An awesome alternative to reddit.",
   "main": "src/index.ts",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "build": "tsc -p .",
     "start": "NODE_PATH=./build node build/index.js",
