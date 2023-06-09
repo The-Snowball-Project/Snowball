@@ -10,6 +10,7 @@ permissions:
 jobs:
   compose:
     name: Run docker compose
+    runs-on: ubuntu-latest
     steps:
       # need checkout before using compose-action
       - uses: actions/checkout@v3
