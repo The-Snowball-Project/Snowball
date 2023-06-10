@@ -35,7 +35,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./nodemon.json:/app/nodemon.json
-    #needed?
+    #needed? I think so, throws a weird error if you put it in the dockerfile
     expose:
       - 3000
     depends_on:
@@ -55,7 +55,7 @@ services:
       - 80:80
       - 443:443
       - 3000:3000
-    command: npx ts-node src/index.ts
+    command: npm run dev
     networks:
       - postgres
 networks:

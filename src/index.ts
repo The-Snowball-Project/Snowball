@@ -1,31 +1,62 @@
+const express = require('express');
 import app from './server';
-//import routes_list from './routes/routes_list';
-import fs from 'fs';
-
-console.log("wefrgthbyjkterwopqidejrhbgjdriefjkrnf why the fuck is this not foring ffs")
+import logger from './util/logger';
+const fs = require('fs'); // require is necessery for some reason, fs is undefined otherwise
+const path = require('path'); // same for this
 
 const process_port:string = process.env.PORT||"0";
 const port: number = parseInt(process_port) || 3000;
+const router = express.Router();
 
-const routes_list:Array<[string,Function]> = await (async ():Promise<Array<[string,Function]>> => {
-    const route_files:string[] = await new Promise((resolve, _reject) => {
-        fs.readdir('./src/commands', async (err, files) => {
-            if (err) {
-                console.error(`\033[32mFailed to get route, error: ${err}\033[0m`)
-            }
-            resolve(files);
-        });
-    });
-    const routes_list:Array<[string,Function]> = [];
-    for (const file of route_files) {
-        routes_list.push((await import(`./routes/${file}`)).default)
+
+logger.info('Importing routes...')
+
+const routes_list:Array<[string,string,Function]> = [];
+// read all files recursivly from src/routes and filter out all but .ts files
+for (const file of fs.readdirSync("src/routes",{recursive:true,withFileTypes:true}).filter((file:any)=>file.name && path.extname(file.name)==='.ts')) {
+    try {
+        // import route from each file using the path returned by readdirSync() so subdirectories
+        // work and add it to the list of routes
+        routes_list.push(require(`../${file.path}/${file.name.split('.')[0]}`).default);
+    } catch (e:any) {
+        logger.warn(`Failed to import "${file.path}/${file.name}"`)
     }
-    console.log(routes_list);
-    return routes_list;
-})();
-
-for(const route of routes_list){
-    app.use(route[0],route[1])
 }
 
-app.listen(port,()=>console.log("listening",port))
+logger.info('Adding routes...');
+
+for(const route of routes_list) {
+    switch (route[1]) {
+        case "ALL":
+            router.all(route[0],route[2]);
+        case "GET":
+            router.get(route[0],route[2]);
+            break;
+        case "POST":
+            router.post(route[0],route[2]);
+            break;
+        case "HEAD":
+            router.head(route[0],route[2]);
+            break;
+        case "PUT":
+            router.put(route[0],route[2]);
+            break;
+        case "DELETE":
+            router.delete(route[0],route[2]);
+            break;
+        case "OPTIONS":
+            router.options(route[0],route[2]);
+            break;
+        default:
+            logger.warn(`Unknown method "${route[1]}" for route "${route[0]}"`);
+            break;
+    }
+    
+    logger.info(`Added route "${route[0]}"`);
+}
+
+logger.info('Added all routes!');
+
+app.use('/',router);
+
+app.listen(port,()=>logger.info(`Listening on port ${port}`));
