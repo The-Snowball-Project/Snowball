@@ -8,6 +8,7 @@ COPY tsconfig.json ./
 
 RUN npm i
 
+COPY . .
 
 FROM base as production
 
