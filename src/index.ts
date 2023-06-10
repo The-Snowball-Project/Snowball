@@ -5,6 +5,6 @@ import router from './router';
 const process_port:string = process.env.PORT||"0";
 const port: number = parseInt(process_port) || 3000;
 
-app.use('/',router);
+app.use('/api',router);
 
 app.listen(port,()=>logger.info(`Listening on port ${port}`));

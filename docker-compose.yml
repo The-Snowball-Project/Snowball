@@ -35,7 +35,6 @@ services:
     volumes:
       - ./src:/app/src
       - ./nodemon.json:/app/nodemon.json
-    #needed? I think so, throws a weird error if you put it in the dockerfile
     expose:
       - 3000
     depends_on:
@@ -49,7 +48,7 @@ services:
       PORT: ${PORT}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: db
+      DB_HOST: db #points to db: the service above
       DB_PORT: 5432
       DB_PATH: ${DB_PATH}
     ports:

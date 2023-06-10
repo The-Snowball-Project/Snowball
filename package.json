@@ -5,7 +5,7 @@
   "description": "An awesome alternative to reddit.",
   "main": "src/index.ts",
   "engines": {
-    "node": "v20.x"
+    "node": "18.x"
   },
   "scripts": {
     "build": "tsc -p .",
