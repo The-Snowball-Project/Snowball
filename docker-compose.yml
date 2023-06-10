@@ -26,6 +26,7 @@ services:
       timeout: 10s
     networks:
       - postgres
+  
   snowball:
     build:
       context: .
@@ -54,7 +55,7 @@ services:
       - 80:80
       - 443:443
       - 3000:3000
-    command: npm run dev
+    command: npx ts-node src/index.ts
     networks:
       - postgres
 networks:

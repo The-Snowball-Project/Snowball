@@ -9,7 +9,8 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "NODE_PATH=./build node build/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "special-needs": "echo \"hi\" && nodemon --watch \"src/**/*.ts\" --exec \"clear && ts-node src/ts/index.ts\""
   },
   "repository": {
     "type": "git",
