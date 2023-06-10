@@ -1,8 +1,8 @@
-const express = require('express');
+import * as express from 'express';
 import app from './server';
 import logger from './util/logger';
-const fs = require('fs'); // require is necessery for some reason, fs is undefined otherwise
-const path = require('path'); // same for this
+import * as fs from 'fs'; // require is necessery for some reason, fs is undefined otherwise
+import * as path from 'path'; // same for this
 
 const process_port:string = process.env.PORT||"0";
 const port: number = parseInt(process_port) || 3000;
@@ -11,7 +11,7 @@ const router = express.Router();
 
 logger.info('Importing routes...')
 
-const routes_list:Array<[string,string,Function]> = [];
+const routes_list:Array<[string,string,(req:any,res:any)=>any]> = [];
 // read all files recursivly from src/routes and filter out all but .ts files
 for (const file of fs.readdirSync("src/routes",{recursive:true,withFileTypes:true}).filter((file:any)=>file.name && path.extname(file.name)==='.ts')) {
     try {
