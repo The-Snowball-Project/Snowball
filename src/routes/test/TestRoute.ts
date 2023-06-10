@@ -1,12 +1,11 @@
-const express = require("express"); 
+import * as express from 'express'
 import TestController from './TestController';
 
-const TestRouter = function(req:Request, res:any, next:any){
-    const router:any = express.Router();
-    const controller = new TestController();
-    //wire functions to routes here
-    router.get(controller.get(req,res));
-    return router    
-}
+const router = express.Router();
+const controller = new TestController();
 
-export default TestRouter;
+router.get('/', controller.get);
+router.post('/',controller.post);
+router.get("/id",controller.get_by_id)
+
+export default router;
