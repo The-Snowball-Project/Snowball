@@ -5,7 +5,10 @@ import * as path from 'path';
 //key index issue with types:so any
 const router:any = express.Router(); 
 
-const routes_list:Array<[string,string,Function]> = [];
+type Method = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE' ;
+type Handler = (arg0: Request, arg1: Response) => (void | Promise<void>);
+type Route = [string, Method, Handler];
+const routesList: Route[] = [];
 logger.info('Importing routes...')
 
 glob.sync( 'src/routes/**/*.ts' ).forEach((file:string)=>{
