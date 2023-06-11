@@ -1,7 +1,7 @@
 const express = require('express');
-import * as glob from 'glob'
+import {glob} from 'glob'
 import logger from './util/logger';
-import * as path from 'path';
+import path from 'path';
 //key index issue with types:so any
 const router:any = express.Router(); 
 
