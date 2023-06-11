@@ -12,10 +12,10 @@ const routesList: Route[] = [];
 logger.info('Importing routes...')
 
 glob.sync( 'src/routes/**/*.ts' ).forEach((file:string)=>{
-    routes_list.push(require(path.resolve(file)).default);
+    routesList.push(require(path.resolve(file)).default);
 });
   
-for(const [path,method,fn] of routes_list) {
+for(const [path,method,fn] of routesList) {
     logger.info(`Adding route: ${path}`);
     try{
         router[(method).toLowerCase()](path,fn);
