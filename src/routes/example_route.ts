@@ -1,4 +1,3 @@
-import { response } from 'express';
 import pool from '../dbconfig/dbconfig';
 const route = ['/','GET',  (req:Request,res:any)=>{
     try {

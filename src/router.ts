@@ -1,14 +1,16 @@
-const express = require('express');
+import express from 'express';
 import {glob} from 'glob'
 import logger from './util/logger';
 import path from 'path';
 //key index issue with types:so any
-const router:any = express.Router(); 
 
 type Method = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE' ;
 type Handler = (arg0: Request, arg1: Response) => (void | Promise<void>);
 type Route = [string, Method, Handler];
+
+const router:any = express.Router(); 
 const routesList: Route[] = [];
+
 logger.info('Importing routes...')
 
 glob.sync( 'src/routes/**/*.ts' ).forEach((file:string)=>{
