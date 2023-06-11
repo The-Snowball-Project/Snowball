@@ -1,8 +1,13 @@
 import pool from '../dbconfig/dbconfig';
-const route = ['/','GET',  (req:Request,res:any)=>{
+import Route from '../types/route';
+
+
+
+const exampleRoute:Route = ['/','GET',  (req:Request,res:any)=>{
+    //it should be wrapped in a try catch;
     try {
         const sql = "SELECT * FROM test";
-        const params = null
+        const params = null;
         pool
             .connect()
             .then((db:any)=>db
@@ -12,14 +17,19 @@ const route = ['/','GET',  (req:Request,res:any)=>{
                         .send(data.rows);
                     db.release();
                     res.end();
-
-            }));
+                })
+            );
     } catch (error) {
         res.status(400)
             .send(error);
         res.end();
-
     }
 }];
 
-export default route;
+//put all the routes in an array, and export that array.
+
+const exampleRoutes:Array<Route> = [
+    exampleRoute
+]
+
+export default exampleRoutes;
