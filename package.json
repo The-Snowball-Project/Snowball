@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "NODE_PATH=./build node build/index.js",
-    "migrate":"npx prisma db pull && npx prisma generate",
+    "migrate": "npx prisma db pull && npx prisma generate",
     "dev": "nodemon src/index.ts"
   },
   "repository": {
@@ -25,8 +25,10 @@
   "homepage": "https://github.com/reddit-replacement/Snowball#readme",
   "dependencies": {
     "@prisma/client": "^4.15.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "glob": "^10.2.7",
+    "helmet": "^7.0.0",
     "nodemon": "^2.0.22",
     "pg": "^8.11.0",
     "prisma": "^4.15.0",
@@ -37,6 +39,7 @@
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/pg": "^8.10.2"
   }
