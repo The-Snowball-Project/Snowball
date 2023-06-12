@@ -1,32 +1,6 @@
 version: '3.4'
 
 services:
-  db:
-    image: postgres:latest
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 3s
-        max_attempts: 3
-        window: 120s
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_PATH}
-    ports:
-      - 5432:5432
-    volumes:
-      - ./data:/var/lib/postgresql/data
-      - ./sql/test.sql:/docker-entrypoint-initdb.d/test.sql
-    extra_hosts:
-      - "host.docker.internal:127.0.0.1"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -q -U ${DB_USER} -d ${DB_PATH}"]
-      interval: 1s
-      timeout: 10s
-    networks:
-      - postgres
-  
   snowball:
     build:
       context: .
@@ -37,28 +11,11 @@ services:
       - ./nodemon.json:/app/nodemon.json
     expose:
       - 3000
-    depends_on:
-      db:
-        condition: service_healthy
-    links:
-      - db:sevice_healthy
-    
     environment:
       ENV: dev
-      PORT: ${PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: db #points to db: the service above
-      DB_PORT: 5432
-      DB_PATH: ${DB_PATH}
+      DATABASE_URL: ${DB_URL}
     ports:
       - 80:80
       - 443:443
       - 3000:3000
-    command: npm run dev
-    networks:
-      - postgres
-networks:
-  postgres:
-    driver: bridge
-    
+    command: sh -c "npm run migrate && npm run dev"
