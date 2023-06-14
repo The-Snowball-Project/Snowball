@@ -1,0 +1,57 @@
+openapi: '3.0.2'
+info:
+  title: The Snowball API
+  version: '1.0.0alpha1'
+servers:
+  - url: https://api.weneed.adomain/
+    description: Production server
+paths:
+  /ping:
+    get:
+      responses:
+        '200':
+          description: pong :)
+  /user/{userID}/about:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/ID'
+                  username:
+                    $ref: '#/components/schemas/Username'
+                  join_date:
+                    $ref: '#/components/schemas/DateTime'
+                  posts_score:
+                    $ref: '#/components/schemas/Score'
+                  comments_score:
+                    $ref: '#/components/schemas/Score'
+
+
+components:
+  schemas:
+    ID: 
+      type: string
+      format: NanoID
+      minLength: 21
+      maxLength: 21
+      pattern: '^[A-Za-z0-9_-]{21}$'
+      example: 'ngpJhx5faCLCpvA-djLGY'
+    DateTime:
+      type: string
+      format: date-time
+    Username:
+      type: string
+      minLength: 1
+      maxLength: 38
+      pattern: '^[A-Za-z0-9_-]{1,20}$'
+      example: 'snowball_user'
+    Score:
+      type: integer
+      format: int32
+      example: 59988
