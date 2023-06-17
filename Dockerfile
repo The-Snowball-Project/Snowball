@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-ENV DB_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_PATH}
-
 RUN npm i
 
 COPY . .
