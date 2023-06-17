@@ -42,6 +42,7 @@ model Community {
     Name            String      @db.VarChar(64)
     Description     String      @db.VarChar(1024)
     Population      Int         @default(0)
+    CreatedAt       DateTime    @default(now())
     RequiresApproval Boolean    @default(false)
     Members         CommunityMember[]
     Posts           Post[]
@@ -83,7 +84,7 @@ model Post {
     CommunityID     String      @db.Uuid
     Community       Community   @relation(fields: [CommunityID],references: [CommunityID])
     Type            PostType    @default(TEXT)
-    Title           String      @db.VarChar(128)
+    Title           String      @db.VarChar(128) // maybe index this as well?
     Url             String?     @db.VarChar(1024)
     Body            String?
     Rating          Int
