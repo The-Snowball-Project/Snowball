@@ -2,9 +2,9 @@ FROM node:18-alpine as base
 
 WORKDIR /app
 
-COPY package.json ./
+COPY . .
 
-COPY tsconfig.json ./
+ENV DB_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_PATH}
 
 RUN npm i
 

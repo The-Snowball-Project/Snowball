@@ -48,7 +48,7 @@ services:
       PORT: ${PORT}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: db #points to db: the service above
+      DB_HOST: db # points to db: the service above
       DB_PORT: 5432
       DB_PATH: ${DB_PATH}
     ports:
