@@ -39,11 +39,10 @@ model User {
 
 model Community {
     CommunityID     String      @db.Uuid @id @default(uuid())
-    Name            String      @db.VarChar(64)
+    Name            String      @db.VarChar(64) // index this?
     Description     String      @db.VarChar(1024)
     Population      Int         @default(0)
     CreatedAt       DateTime    @default(now())
-    RequiresApproval Boolean    @default(false)
     Members         CommunityMember[]
     Posts           Post[]
     Tags            TaggedCommunity[]
