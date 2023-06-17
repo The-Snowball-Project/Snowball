@@ -10,8 +10,10 @@ RUN npm i
 
 COPY . .
 
+RUN npx prisma init
+
 FROM base as production
 
-ENV NODE_PATH=./build
+ENV NODE_PATH ./build
 
 RUN npm run build

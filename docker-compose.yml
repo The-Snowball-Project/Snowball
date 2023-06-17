@@ -37,25 +37,19 @@ services:
       - ./nodemon.json:/app/nodemon.json
     expose:
       - 3000
+    environment:
+      ENV: dev
+      DB_URL: postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_PATH}
     depends_on:
       db:
         condition: service_healthy
     links:
-      - db:sevice_healthy
-    
-    environment:
-      ENV: dev
-      PORT: ${PORT}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: db # points to db: the service above
-      DB_PORT: 5432
-      DB_PATH: ${DB_PATH}
+      - db:service_healthy
     ports:
       - 80:80
       - 443:443
       - 3000:3000
-    command: npm run dev
+    command: sh -c "npm run migrate && npm run dev"
     networks:
       - postgres
 networks:
