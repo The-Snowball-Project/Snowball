@@ -49,7 +49,7 @@ services:
       - 80:80
       - 443:443
       - 3000:3000
-    command: sh -c "npm run migrate && npm run dev"
+    command: npm run dev #sh -c "npm run migrate && npm run dev"
     networks:
       - postgres
 networks:
