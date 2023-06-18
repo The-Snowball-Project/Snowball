@@ -1,9 +1,10 @@
-import * as express from 'express';
-import logger from "./util/logger";
+import app from './server';
+import logger from './util/logger';
+import router from './router';
 
-const app = express();
-const port: string = process.env.PORT || "3000";
-app.use(express.static(__dirname + '/public'));
-app.listen(port, () => {
-  logger.info(`testing listening on port ${port}`)
-})
+const process_port:string = process.env.PORT||"0";
+const port: number = parseInt(process_port) || 3000;
+
+app.use('/api',router);
+
+app.listen(port,()=>logger.info(`Listening on port ${port}`));

@@ -1,12 +1,16 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "esModuleInterop": true,
+        "module": "CommonJS",
         "moduleResolution": "node",
         "target": "es2022",
         "rootDir": "./src",
         "outDir": "./build",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "allowSyntheticDefaultImports":true
-    }
+        "allowSyntheticDefaultImports":true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+    },
+    "include":["src",".d.ts"]
 }
