@@ -1,7 +1,7 @@
 import app from './server';
 import logger from './util/logger';
 import router from './router';
-import test from './schemaTest';
+import test from './schema_test';
 
 test();
 

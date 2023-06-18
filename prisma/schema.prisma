@@ -19,7 +19,7 @@ model LoginInfo {
 model User {
     UserID          String      @db.Uuid @id @default(uuid())
     LoginInfo       LoginInfo?
-    Name            String      @db.VarChar(32)
+    Name            String      @db.VarChar(32) @unique
     LastActed       DateTime    @default(now())
     Joined          DateTime    @default(now())
     Bio             String      @db.VarChar(1024) @default("")
@@ -40,7 +40,7 @@ model User {
 
 model Community {
     CommunityID     String      @db.Uuid @id @default(uuid())
-    Name            String      @db.VarChar(64) // index this?
+    Name            String      @db.VarChar(64) @unique // index this?
     Description     String      @db.VarChar(1024)
     Population      Int         @default(0)
     CreatedAt       DateTime    @default(now())
@@ -57,6 +57,8 @@ model CommunityMember {
     Admin           Boolean     @default(false)
     Banned          Boolean     @default(false)
     @@unique([UserID,CommunityID])
+    @@index([UserID])
+    // do we want to index CommunityID?
 }
 
 model Blocked {
@@ -73,8 +75,8 @@ model Vote {
     PostID          String      @db.Uuid
     Post            Post        @relation(fields: [PostID],references: [PostID])
     VoteValue       Boolean     @default(true)
-    @@index([UserID,PostID])
     @@unique([UserID,PostID])
+    @@index([UserID,PostID]) // this seems pointless to me? index them individualy?
 }
 
 // skipped IsApproved field, because we decided it was
