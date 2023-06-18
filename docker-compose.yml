@@ -26,7 +26,7 @@ services:
       timeout: 10s
     networks:
       - postgres
-  
+
   snowball:
     build:
       context: .
@@ -39,7 +39,6 @@ services:
       - 3000
     environment:
       ENV: dev
-      DB_URL: postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_PATH}
     depends_on:
       db:
         condition: service_healthy
@@ -49,9 +48,10 @@ services:
       - 80:80
       - 443:443
       - 3000:3000
-    command: npm run dev #sh -c "npm run migrate && npm run dev"
+    command: sh -c "npm run migrate && npm run dev"
     networks:
       - postgres
+
 networks:
   postgres:
     driver: bridge

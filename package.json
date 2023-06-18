@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "NODE_PATH=./build node build/index.js",
-    "migrate": "npx prisma db pull && npx prisma generate",
+    "migrate": "npx prisma generate && npx prisma migrate",
     "dev": "nodemon src/index.ts"
   },
   "repository": {

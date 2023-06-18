@@ -25,6 +25,7 @@ model User {
     Bio             String      @db.VarChar(1024)
     CommentsScore   Int         @default(0)
     PostsScore      Int         @default(0)
+    IsDeleted       Boolean     @default(false)
     Communities     CommunityMember[]
     Comments        Comment[]
     Posts           Post[]

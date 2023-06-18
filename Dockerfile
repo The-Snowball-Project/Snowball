@@ -6,12 +6,12 @@ COPY . .
 
 RUN npm i
 
-COPY . .
+ENV DB_URL postgresql://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_PATH}
 
-RUN npx prisma init
+RUN npx prisma generate
 
 FROM base as production
 
 ENV NODE_PATH ./build
 
-RUN npm run build
+RUN npm run dev
