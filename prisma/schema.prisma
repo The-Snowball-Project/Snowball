@@ -22,7 +22,7 @@ model User {
     Name            String      @db.VarChar(32)
     LastActed       DateTime    @default(now())
     Joined          DateTime    @default(now())
-    Bio             String      @db.VarChar(1024)
+    Bio             String      @db.VarChar(1024) @default("")
     CommentsScore   Int         @default(0)
     PostsScore      Int         @default(0)
     IsDeleted       Boolean     @default(false)

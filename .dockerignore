@@ -6,3 +6,6 @@
 !.npmrc
 !prisma
 !src
+
+#remove this if u have problems or are deploying (also remember to add npm i to DockerFile)
+!node_modules
