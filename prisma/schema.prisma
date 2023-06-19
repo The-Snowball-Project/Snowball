@@ -10,7 +10,7 @@ generator client {
 
 model LoginInfo {
     Email           String      @db.VarChar(64) @id // 64 is heaps, I googled
-    // this should be changed to the length of the password hash once know what we are using
+    // this should be changed to the length of the password hash once we know what we are using
     Password        String      @db.Char(128)
     UserID          String      @db.Uuid @unique
     User            User        @relation(fields: [UserID],references: [UserID])
@@ -199,7 +199,7 @@ model TaggedCommunity {
     @@unique([TagID,TaggedID])
 }
 
-// should we make rRporterID+ReportedID unique to prevent spam reporting?
+// should we make RporterID+ReportedID unique to prevent spam reporting?
 model Report {
     ReportID        String      @db.Uuid @id @default(uuid())
     ReporterID      String      @db.Uuid
