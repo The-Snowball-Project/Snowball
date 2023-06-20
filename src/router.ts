@@ -15,11 +15,11 @@ glob.sync( 'src/routes/**/*.ts' ).forEach((file:string)=>{
     routesList.push(...require(path.resolve(file)).default);
 });
 for(const [path,method,fn] of routesList) {
-    logger.info(`Adding route: ${path}`);
+    logger.info(`Adding route: '${path}'`);
     try{
         router[(method).toLowerCase()](path,fn);
     }catch(e){
-        logger.error(`${method} is not a method of the router.\n${e}`);
+        logger.error(`'${method}' is not a method of the router.\n${e}`);
     }   
 }
 

@@ -4,8 +4,9 @@
 !package.json
 !tsconfig.json
 !.npmrc
+!JWT_SECRET.*
 !prisma
 !src
 
-#remove this if u have problems or are deploying (also remember to add npm i to DockerFile)
+#remove this if u have problems or for prod (also remember to uncomment npm i in the DockerFile too)
 !node_modules
