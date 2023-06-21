@@ -38,6 +38,7 @@ class Authenticator {
      * @returns the provided handler or a handler that calls the provided handler
      */
     public resolve(auth:Auth,handler:Handler):Handler {
+        
         if (auth === 'none') return handler;
 
         const requireAuth = !(auth === 'optional')

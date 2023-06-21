@@ -13,6 +13,7 @@ model LoginInfo {
     // this should be changed to the length of the password hash once we know what we are using
     Password        String      @db.Char(128)
     UserID          String      @db.Uuid @unique
+    IsAdmin         Boolean     @default(false) // this is duplicated in User table to remove a join on login (is it worth it?)
     User            User        @relation(fields: [UserID],references: [UserID])
 }
 
@@ -20,6 +21,7 @@ model User {
     UserID          String      @db.Uuid @id @default(uuid())
     LoginInfo       LoginInfo?
     Name            String      @db.VarChar(32) @unique
+    IsAdmin         Boolean     @default(false)
     LastActed       DateTime    @default(now())
     Joined          DateTime    @default(now())
     Bio             String      @db.VarChar(1024) @default("")
