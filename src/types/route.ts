@@ -1,7 +1,9 @@
-type Method = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' ;
+export type Method = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' ;
 
-type Handler = (arg0: Request, arg1: Response) => (void | Promise<void>);
+export type Handler = (req:any, res:any) => (void | Promise<void>);
 
-type Route = [string, Method, Handler];
+export type Auth = 'none' | 'optional' | 'required' | 'admin';
+
+type Route = [string, Method, Handler, Auth];
 
 export default Route;

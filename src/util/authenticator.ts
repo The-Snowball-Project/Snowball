@@ -1,6 +1,7 @@
 import jwt, { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
 import logger from './logger';
 import fs from 'fs';
+import {Auth,Handler} from '../types/route';
 
 class Authenticator {
     
@@ -16,6 +17,34 @@ class Authenticator {
     public constructor() {
         setInterval(this.removeInvalid.bind(this),1000*60*60*24); // set job to run once a day
     }
+
+    /**
+     * resolves an auth level and a request handler to a single request handler
+     * which drops requests that dont meet the provided auth prerequisites
+     * (so returns the original request handler if the auth level is 'none')
+     * 
+     * @param auth required auth level
+     * @param handler route handler to call
+     * @returns the provided handler or a handler that calls the provided handler
+     */
+    public resolve(auth:Auth,handler:Handler):Handler {
+        if (auth === 'none') return handler;
+
+        const requireAuth = !(auth === 'optional')
+        const requireAdmin = auth === 'admin';
+
+        return ((req:any,res:any):void | Promise<void> => {
+
+            if (req.cookies.auth) {
+                const auth = this.verify(req.cookies);
+            }
+            if (requireAuth) res.status(401).send('unauthorized');
+
+            return handler(req,res);
+        }).bind(this);
+    }
+
+
 
     /**
      * creates a new token for the provided userID
@@ -46,8 +75,9 @@ class Authenticator {
     /**
      * 
      * @param token the token to verify
+     * @returns
      */
-    verifyToken(token:string):{valid:boolean,userID:String,isAdmin:boolean} {
+    verify(token:string):{valid:boolean,userID:String,isAdmin:boolean} {
         let result;
         try {
             result = jwt.verify(token,this.publicKey,{algorithms:[this.algorithm]}) as JwtPayload;
