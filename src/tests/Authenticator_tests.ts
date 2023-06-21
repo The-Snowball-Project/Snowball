@@ -40,8 +40,9 @@ export default function test():boolean {
     if (!auth.invalidate(token)) {
         logger.error(`invalidate() failed to verify token: '${token}`);
         passed = false;
-    } result = auth.verify(token);
-    if (!result.valid || !result.isAdmin) {
+    }
+    result = auth.verify(token);
+    if (result.valid) {
         logger.error(`Test 4 failed, test: invalidated token, returned: ${JSON.stringify(result)}, token: '${token}'`);
         passed = false;
     } else logger.verbose('Test 4 passed');

@@ -1,8 +1,15 @@
-import jwt, { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
-import logger from './logger';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import fs from 'fs';
 import {Auth,Handler} from '../types/route';
+import getErrorPage from './error_pages';
+import logger from './logger';
 
+/**
+ * the authenticator class which handles everythig related to authentication, such as:
+ * creating tokens, verifying tokens, invalidating tokens and adding authentication and
+ * authorization prerequisites to request paths
+ * 
+ */
 class Authenticator {
     
     private privateKey:string = fs.readFileSync(__dirname+'/../../JWT_SECRET.key','utf8');
@@ -21,7 +28,10 @@ class Authenticator {
     /**
      * resolves an auth level and a request handler to a single request handler
      * which drops requests that dont meet the provided auth prerequisites
-     * (so returns the original request handler if the auth level is 'none')
+     * 
+     * it also adds req.auth for authenticated requests, which is the object
+     * returned by this.verify(token) ({valid:boolean,userID:boolean,isAdmin:boolean},
+     * valid is always true in this case)
      * 
      * @param auth required auth level
      * @param handler route handler to call
@@ -35,16 +45,36 @@ class Authenticator {
 
         return ((req:any,res:any):void | Promise<void> => {
 
+            // this code is ugly and annoying to read but idk
+            // how to make it better without fall through
+            // switch cases and goto statements
             if (req.cookies.auth) {
-                const auth = this.verify(req.cookies);
-            }
-            if (requireAuth) res.status(401).send('unauthorized');
+                const auth = this.verify(req.cookies.auth);
 
-            return handler(req,res);
+                if (!auth.valid) {
+                    if (requireAuth) {
+                        res.status(401).send(getErrorPage(401));
+                        return;
+                    } else
+                        return handler(req,res);
+                }
+
+                if (requireAdmin && !auth.isAdmin) {
+                    res.status(403).send(getErrorPage(403));
+                    return;
+                }
+
+                req['auth'] = auth;
+
+                return handler(req,res);
+
+            } else if (requireAuth) {
+                res.status(401).send(getErrorPage(401));
+                return;
+            } else
+                return handler(req,res);
         }).bind(this);
     }
-
-
 
     /**
      * creates a new token for the provided userID
@@ -54,6 +84,10 @@ class Authenticator {
      * @returns the generated token
      */
     public createToken(userID:String,admin:boolean):string {
+
+        // if at signed 4 byte int limit, wrap around to 0
+        if (this.currentTokenID==2_147_483_647) this.currentTokenID = 0;
+
         const token = jwt.sign(
             {
                 userID:userID,
@@ -66,8 +100,6 @@ class Authenticator {
                 expiresIn:'5d'
             }
         );
-
-        if (this.currentTokenID==2_147_483_647) this.currentTokenID = 0; // if at signed 4 byte int limit, wrap around to 0
         
         return token
     }
@@ -77,28 +109,37 @@ class Authenticator {
      * @param token the token to verify
      * @returns
      */
-    verify(token:string):{valid:boolean,userID:String,isAdmin:boolean} {
+    verify(token:string):{valid:true,userID:String,isAdmin:boolean} | {valid:false,tokenExpired:boolean} {
         let result;
+        let tokenExpired = false;
         try {
             result = jwt.verify(token,this.publicKey,{algorithms:[this.algorithm]}) as JwtPayload;
-        } catch (e) {}
+        } catch (e:any) {
+            tokenExpired = e.name === 'TokenExpiredError';
+        }
 
         if (!result || this.invalidatedTokens.has(result.tokenID))
-            return {valid:false,userID:'',isAdmin:false};
+            return {valid:false,tokenExpired:tokenExpired};
         
         return {valid:true,userID:result.userID,isAdmin:result.isAdmin};
     }
 
     /**
+     * invalidates a token
      * 
      * @param token token to invalidate
-     * @returns false if the token was invalid, true on success
+     * @returns true on success, false if the token was invalid
      */
     invalidate(token:string):boolean {
-        const result = jwt.verify(token,this.privateKey);
-        if (typeof result === 'string')
-            return false;
-        this.invalidatedTokens.set(result.userID,result.exp!);
+        let result;
+        try {
+            result = jwt.verify(token,this.publicKey,{algorithms:[this.algorithm]}) as JwtPayload;
+        } catch (e) {}
+
+        if (!result) return false;
+
+        this.invalidatedTokens.set(result.tokenID,result.exp!);
+
         return true;
     }
 
