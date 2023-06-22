@@ -9,7 +9,7 @@ function login() {
         console.log(request.responseText)
         let res = JSON.parse(request.responseText);
         if (res.status==='success') {
-            document.cookie = 'auth='+res.token+'; max-age='+(60*60*24*5)+'; path=/; Same-site=Strict';
+            document.cookie = 'auth='+res.token+'; max-age='+(60*60*24*5)+'; path=/; Samesite=Strict';
             window.location.href = '/api/admin';
         } else {
             document.getElementById('error').textContent = 'Invalid credentials!'
