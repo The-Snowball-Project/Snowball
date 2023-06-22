@@ -49,6 +49,7 @@ class Authenticator {
             // this code is ugly and annoying to read but idk
             // how to make it better without fall through
             // switch cases and goto statements
+            logger.info(JSON.stringify(req.cookies))
             if (req.cookies.auth) {
                 const auth = this.verify(req.cookies.auth);
 

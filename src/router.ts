@@ -15,7 +15,6 @@ glob.sync( 'src/routes/**/*.ts' ).forEach((file:string)=>{
 });
 for (const [path,method,auth,handler] of routesList) {
     logger.info(`Adding route: /api${path}`);
-    logger.info(JSON.stringify(routesList))
     try{
         router[(method).toLowerCase()](path,global.authenticator.resolve(auth,handler));
     }catch(e){

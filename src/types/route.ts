@@ -1,4 +1,4 @@
-export type Method = 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' ;
+export type Method = 'ALL' | 'GET' | 'PUT' | 'POST' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' ;
 
 export type Handler = (req:any, res:any) => (void | Promise<void>);
 
