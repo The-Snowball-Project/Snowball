@@ -1,0 +1,224 @@
+
+datasource db {
+    provider = "postgresql"
+    url = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model LoginInfo {
+    Email           String      @db.VarChar(64) @id // 64 is heaps, I googled.
+    Password        String      @db.Char(60) // change this to the len of the password hash if it is changed
+    UserID          String      @db.Uuid @unique @default(uuid())
+    IsAdmin         Boolean     // this is duplicated from User table to remove a join for every login request
+    // User            User?       @relation(fields: [UserID],references: [UserID])
+}
+
+model User {
+    UserID          String      @db.Uuid @id @default(uuid())
+    //LoginInfo       LoginInfo?
+    Name            String      @db.VarChar(32) @unique
+    IsAdmin         Boolean     
+    LastActed       DateTime    @default(now())
+    Joined          DateTime    @default(now())
+    Bio             String      @db.VarChar(1024) @default("")
+    CommentsScore   Int         @default(0)
+    PostsScore      Int         @default(0)
+    IsDeleted       Boolean     @default(false)
+    Communities     CommunityMember[]
+    Comments        Comment[]
+    Posts           Post[]
+    Rewards         Rewarded[]
+    BlockedUsers    Blocked[]   @relation(name:"BlockedUsers")
+    BlockedBy       Blocked[]   @relation(name:"BlockedBy")
+    Votes           Vote[]
+    CompletedRequirements CompletedRequirement[]
+    ReportedUsers   Report[]    @relation(name:"ReportedUsers")
+    ReportsAgainst  Report[]    @relation(name:"ReportsAgainst")
+}
+
+model Community {
+    CommunityID     String      @db.Uuid @id @default(uuid())
+    Name            String      @db.VarChar(64) @unique // index this?
+    Description     String      @db.VarChar(1024)
+    Population      Int         @default(0)
+    CreatedAt       DateTime    @default(now())
+    Members         CommunityMember[]
+    Posts           Post[]
+    Tags            TaggedCommunity[]
+}
+
+model CommunityMember {
+    UserID          String      @db.Uuid
+    User            User        @relation(fields: [UserID],references: [UserID])
+    CommunityID     String      @db.Uuid
+    Community       Community   @relation(fields: [CommunityID],references: [CommunityID])
+    Admin           Boolean     @default(false)
+    Banned          Boolean     @default(false)
+    @@unique([UserID,CommunityID])
+    @@index([UserID])
+    // do we want to index CommunityID?
+}
+
+model Blocked {
+    blockedID       String      @db.Uuid
+    blocked         User        @relation("BlockedBy",fields: [blockedID],references: [UserID])
+    blockeeID       String      @db.Uuid
+    blockeeUser     User        @relation("BlockedUsers",fields: [blockeeID],references: [UserID])
+    @@unique([blockedID,blockeeID])
+}
+
+model Vote {
+    UserID          String      @db.Uuid
+    User            User        @relation(fields: [UserID],references: [UserID])
+    PostID          String      @db.Uuid
+    Post            Post        @relation(fields: [PostID],references: [PostID])
+    VoteValue       Boolean     @default(true)
+    @@unique([UserID,PostID])
+    @@index([UserID,PostID]) // this seems pointless to me? index them individualy?
+}
+
+// skipped IsApproved field, because we decided it was
+// unrealistic for mods to approve every individual post
+model Post {
+    PostID          String      @db.Uuid @id @default(uuid())
+    CommunityID     String      @db.Uuid
+    Community       Community   @relation(fields: [CommunityID],references: [CommunityID])
+    Type            PostType    @default(TEXT)
+    Title           String      @db.VarChar(128) // maybe index this as well?
+    Url             String?     @db.VarChar(1024)
+    Body            String?
+    Rating          Int
+    AuthorID        String      @db.Uuid
+    Author          User        @relation(fields: [AuthorID],references: [UserID])
+    PostedAt        DateTime    @default(now())
+    LastEdited      DateTime?
+    IsDeleted       Boolean     @default(false)
+    IsUserDeleted   Boolean?
+    IsLocked        Boolean     @default(false)
+    IsArchived      Boolean     @default(false)
+    Comments        Comment[]
+    Votes           Vote[]
+    Tags            TaggedPost[]
+    @@index([CommunityID])
+    @@unique([PostID,CommunityID])
+}
+
+model Comment {
+    CommentID       String      @db.Uuid @id @default(uuid())
+    PostID          String      @db.Uuid
+    Post            Post        @relation(fields: [PostID],references: [PostID])
+    AuthorID        String      @db.Uuid
+    Author          User        @relation(fields: [AuthorID],references: [UserID])
+    Body            String
+    Rating          Int         @default(0)
+    PostedAt        DateTime    @default(now())
+    LastEdited      DateTime?
+    IsDeleted       Boolean     @default(false)
+    IsUserDeleted   Boolean?
+    UpVotes         Int         @default(0)
+    DownVotes       Int         @default(0)
+    ParentCommentID String?     @db.Uuid
+    ParentComment   Comment?    @relation("ChildComments",fields: [ParentCommentID],references: [CommentID])
+    ChildComments   Comment[]   @relation("ChildComments")
+    @@index([ParentCommentID])
+}
+
+model Reward {
+    RewardID        String      @db.Uuid @id @default(uuid())
+    Reward          String      @db.VarChar(255)
+    MinRequirements Int
+    RewardedTo      Rewarded[]
+    RewardRequirements RewardRequirementLink[]
+}
+
+// join table between Rewards and Users
+model Rewarded {
+    RewardID        String      @db.Uuid
+    Reward          Reward      @relation(fields:[RewardID],references:[RewardID])
+    RewardeeID      String      @db.Uuid
+    Rewardee        User        @relation(fields:[RewardeeID],references:[UserID])
+    @@id([RewardID,RewardeeID])
+}
+
+// join table between RewardRequirements and Rewards
+model RewardRequirementLink {
+    RewardID        String      @db.Uuid
+    Reward          Reward      @relation(fields: [RewardID],references: [RewardID])
+    RequirementID   String      @db.Uuid
+    Requirement     RewardRequirement @relation(fields: [RequirementID],references: [RequirementID])
+    Mandatory       Boolean     @default(false)
+    @@unique([RewardID,RequirementID])
+}
+
+// we need to work out how to make this viable
+model RewardRequirement {
+    RequirementID   String      @db.Uuid @id @default(uuid())
+    Description     String      @db.VarChar(1024)
+    LinkedRewards   RewardRequirementLink[]
+    CompletedUsers  CompletedRequirement[]
+}
+
+// join table between Users and RewardRequirements (so ones they have comepleted)
+//
+// can users complete the same requirement multiple times
+// without "cashing in" them? (or even *with* cashing them in?)
+model CompletedRequirement {
+    RequirementID   String      @db.Uuid
+    Requirement     RewardRequirement @relation(fields: [RequirementID],references: [RequirementID])
+    UserID          String      @db.Uuid
+    User            User        @relation(fields: [UserID],references: [UserID])
+    @@unique([RequirementID,UserID])
+}
+
+model Tag {
+    TagID           String      @db.Uuid @id @default(uuid())
+    Tag             String      @db.VarChar(24)
+    TaggedPosts     TaggedPost[]
+    TaggedCommunities TaggedCommunity[]
+}
+
+// I couldnt find a better way of doing this, so
+// made 2 tables. I found a github issue with a solution
+// except the solution didnt appear to work, link is:
+// https://github.com/prisma/prisma/issues/11932
+model TaggedPost {
+    TagID           String      @db.Uuid
+    Tag             Tag         @relation(fields: [TagID],references: [TagID])
+    TaggedID        String      @db.Uuid
+    Tagged          Post        @relation(fields: [TaggedID],references: [PostID])
+    @@unique([TagID,TaggedID])
+}
+
+model TaggedCommunity {
+    TagID           String      @db.Uuid
+    Tag             Tag         @relation(fields: [TagID],references: [TagID])
+    TaggedID        String      @db.Uuid
+    Tagged          Community   @relation(fields: [TaggedID],references: [CommunityID])
+    @@unique([TagID,TaggedID])
+}
+
+// should we make RporterID+ReportedID unique to prevent spam reporting?
+model Report {
+    ReportID        String      @db.Uuid @id @default(uuid())
+    ReporterID      String      @db.Uuid
+    Reporter        User        @relation("ReportedUsers",fields: [ReporterID],references: [UserID])
+    ReportedID      String      @db.Uuid
+    Reported        User        @relation("ReportsAgainst",fields: [ReportedID],references: [UserID])
+    Body            String      @db.VarChar(4069)
+    ReportedAt      DateTime    @default(now())
+    Resolved        Boolean     @default(false)
+    IsArchived      Boolean     @default(false)
+    @@index([ReportedID])
+}
+
+enum PostType {
+    TEXT
+    IMAGE
+    GIF
+    VIDEO
+    LINK
+}
+
