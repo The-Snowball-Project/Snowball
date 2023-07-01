@@ -51,7 +51,7 @@ class Authenticator {
             // switch cases and goto statements
             if (req.cookies.auth) {
                 const auth = this.verify(req.cookies.auth);
-
+                
                 if (!auth.valid) {
                     if (requireAuth) {
                         res.status(401).send(getErrorPage(401));
@@ -122,6 +122,8 @@ class Authenticator {
         if (!result || this.invalidatedTokens.has(result.tokenID))
             return {valid:false,tokenExpired:tokenExpired};
         
+        logger.info(JSON.stringify(result));
+
         return {valid:true,userID:result.userID,isAdmin:result.isAdmin};
     }
 

@@ -9,11 +9,10 @@ generator client {
 }
 
 model LoginInfo {
-    Email           String      @db.VarChar(64) @id // 64 is heaps, I googled
-    // this should be changed to the length of the password hash once we know what we are using
-    Password        String      @db.Char(60)
+    Email           String      @db.VarChar(64) @id // 64 is heaps, I googled.
+    Password        String      @db.Char(60) // change this to the len of the password hash if it is changed
     UserID          String      @db.Uuid @unique @default(uuid())
-    IsAdmin         Boolean     @default(false) // this is duplicated in User table to remove a join on login (is it worth it?)
+    IsAdmin         Boolean     // this is duplicated from User table to remove a join for every login request
     // User            User?       @relation(fields: [UserID],references: [UserID])
 }
 
@@ -21,7 +20,7 @@ model User {
     UserID          String      @db.Uuid @id @default(uuid())
     //LoginInfo       LoginInfo?
     Name            String      @db.VarChar(32) @unique
-    IsAdmin         Boolean     @default(false)
+    IsAdmin         Boolean     
     LastActed       DateTime    @default(now())
     Joined          DateTime    @default(now())
     Bio             String      @db.VarChar(1024) @default("")

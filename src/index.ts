@@ -4,9 +4,8 @@ import app from './server';
 import logger from './util/logger';
 import router from './router';
 
-// NOTE: prismaClient is a global variable, be careful not to overwrite it (declared in preinitilization.ts)
+// NOTE: prismaClient and authenticator are global variables, be careful not to overwrite them (declared in preinitilization.ts)
 
-/*
 // quick test user
 import bcrypt from 'bcrypt';
 const start = new Date();
@@ -22,9 +21,14 @@ logger.info(`Time to hash: ${end.getMilliseconds()-start.getMilliseconds()}ms`);
             IsAdmin:true
         }
     })));
+    logger.info(JSON.stringify(await prismaClient.loginInfo.create({
+        data: {
+            Email:'testuser',
+            Password:passwordHash,
+            IsAdmin: false
+        }
+    })));
 })();
-*/
-
 
 const process_port:string = process.env.PORT||"0";
 const port: number = parseInt(process_port) || 3000;
